@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from sqlalchemy import text
-
+from app.api import auth_router
 from app.core.config import settings
 from app.database.database import engine
 
@@ -42,3 +42,5 @@ def database_health():
             "database": "disconnected",
             "error": str(error),
         }
+        
+app.include_router(auth_router)
