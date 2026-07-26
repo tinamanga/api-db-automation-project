@@ -55,3 +55,27 @@ class UserService:
             .filter(User.id == user_id)
             .first()
         )
+
+    @staticmethod
+    def get_all_users(db):
+        return db.query(User).all()
+
+    @staticmethod
+    def get_user_by_id(db, user_id):
+        return (
+            db.query(User)
+            .filter(User.id == user_id)
+            .first()
+        )
+
+    @staticmethod
+    def update_user(db, user, user_update):
+        update_data = user_update.model_dump(exclude_unset=True)
+
+        for key, value in update_data.items():
+            setattr(user, key, value)
+
+        db.commit()
+        db.refresh(user)
+
+        return user

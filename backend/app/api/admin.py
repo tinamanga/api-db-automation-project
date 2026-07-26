@@ -8,7 +8,8 @@ router = APIRouter(
 )
 
 
-@router.get("/dashboard")
+@router.get("/dashboard",summary="Admin dashboard",
+    description="Accessible only to administrators.",)
 def admin_dashboard(
     current_user=Depends(get_current_admin),
 ):

@@ -6,6 +6,7 @@ from app.schemas.user import UserCreate, UserResponse,UserLogin, Token
 from app.services.user_service import UserService
 from app.auth.jwt import create_access_token
 from fastapi.security import OAuth2PasswordRequestForm
+from app.core.exceptions import ConflictException
 
 
 router = APIRouter(
@@ -16,8 +17,15 @@ router = APIRouter(
 # signup
 @router.post(
     "/register",
+    summary="Register a new user",
+    description="Creates a new user account after validating the request.",
     response_model=UserResponse,
-    status_code=status.HTTP_201_CREATED,
+    status_code=201,
+    responses={
+        201: {"description": "User created successfully"},
+        409: {"description": "Email already registered"},
+    },
+
 )
 def register(
     user: UserCreate,
@@ -29,15 +37,14 @@ def register(
     )
 
     if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email already registered.",
-        )
+       raise ConflictException("Email already registered.")
 
     return UserService.create_user(db, user)
 
 @router.post(
     "/login",
+    summary="Authenticate user",
+    description="Returns a JWT access token for a valid email and password.",
     response_model=Token,
 )
 def login(

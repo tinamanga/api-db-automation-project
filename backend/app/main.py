@@ -3,12 +3,35 @@ from sqlalchemy import text
 from app.api import auth_router,users_router,admin_router
 from app.core.config import settings
 from app.database.database import engine
+from app.core.handlers import register_exception_handlers
 
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    debug=settings.DEBUG,
+    description="""
+## API Database Automation Project
+
+A  FastAPI backend featuring:
+
+- JWT Authentication
+- Role-Based Access Control
+- PostgreSQL
+- SQLAlchemy ORM
+- Alembic Migrations
+- User Management
+- RESTful API
+""",
+    contact={
+        "name": "Christina Manga",
+        "email": "christinamanga28@gmail.com",
+        "url": "https://github.com/tinamanga",
+    },
+    license_info={
+        "name": "MIT License",
+    },
 )
+
+register_exception_handlers(app)
 
 
 @app.get("/")
