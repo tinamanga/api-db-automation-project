@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.auth.hashing import hash_password
+from app.auth.hashing import hash_password,verify_password
 from app.models.user import User
 from app.schemas.user import UserCreate
 
@@ -28,3 +28,30 @@ class UserService:
         db.refresh(db_user)
 
         return db_user
+
+    @staticmethod
+    def authenticate_user(
+        db,
+        email: str,
+        password: str,
+    ):
+        user = UserService.get_user_by_email(db, email)
+
+        if not user:
+            return None
+
+        if not verify_password(password, user.password_hash):
+            return None
+
+        return user
+
+    @staticmethod
+    def get_user_by_id(
+        db: Session,
+        user_id,
+    ):
+        return (
+            db.query(User)
+            .filter(User.id == user_id)
+            .first()
+        )

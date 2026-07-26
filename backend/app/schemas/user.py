@@ -25,3 +25,7 @@ class UserResponse(BaseModel):
     model_config = {
         "from_attributes": True
     }
+# for login purposes
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
