@@ -4,6 +4,7 @@ from app.api import auth_router,users_router,admin_router
 from app.core.config import settings
 from app.database.database import engine
 from app.core.handlers import register_exception_handlers
+from app.middleware.logging import LoggingMiddleware
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -31,6 +32,7 @@ A  FastAPI backend featuring:
     },
 )
 
+app.add_middleware(LoggingMiddleware)
 register_exception_handlers(app)
 
 

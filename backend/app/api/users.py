@@ -11,6 +11,7 @@ from app.database.session import get_db
 from app.services.user_service import UserService
 from uuid import UUID
 from fastapi import HTTPException, status
+from fastapi import Query
 
 router = APIRouter(
     prefix="/users",
@@ -30,15 +31,23 @@ def get_me(
     return current_user
 
 
-@router.get(
-    "/",
-    response_model=list[UserResponse],
-)
-def get_all_users(
+@router.get("/")
+def get_users(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    search: str | None = None,
+    role: str | None = None,
     db: Session = Depends(get_db),
-    current_admin=Depends(get_current_admin),
+    current_user=Depends(get_current_user),
 ):
-    return UserService.get_all_users(db)
+
+    return UserService.get_all_users(
+        db=db,
+        page=page,
+        limit=limit,
+        search=search,
+        role=role,
+    )
 
 @router.get(
     "/{user_id}",

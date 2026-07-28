@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 
 from app.auth.hashing import hash_password,verify_password
+
+from sqlalchemy import or_
 from app.models.user import User
 from app.schemas.user import UserCreate
 
@@ -56,9 +58,47 @@ class UserService:
             .first()
         )
 
+
+
     @staticmethod
-    def get_all_users(db):
-        return db.query(User).all()
+    def get_all_users(
+        db: Session,
+        page: int = 1,
+        limit: int = 10,
+        search: str | None = None,
+        role: str | None = None,
+    ):
+        query = db.query(User)
+
+        # Search by first name, last name or email
+        if search:
+            query = query.filter(
+                or_(
+                    User.first_name.ilike(f"%{search}%"),
+                    User.last_name.ilike(f"%{search}%"),
+                    User.email.ilike(f"%{search}%"),
+                )
+            )
+
+        # Filter by role
+        if role:
+            query = query.filter(User.role == role)
+
+        total = query.count()
+
+        users = (
+            query.offset((page - 1) * limit)
+            .limit(limit)
+            .all()
+        )
+
+        return {
+            "total": total,
+            "page": page,
+            "limit": limit,
+            "pages": (total + limit - 1) // limit,
+            "users": users,
+        }
 
     @staticmethod
     def get_user_by_id(db, user_id):
