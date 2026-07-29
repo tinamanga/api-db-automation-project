@@ -57,3 +57,24 @@ class UserResponse(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class UserListItem(BaseModel):
+    id: UUID
+    first_name: str
+    last_name: str
+    email: str
+    role: str
+    is_active: bool
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
+class PaginatedUsersResponse(BaseModel):
+    total: int
+    page: int
+    limit: int
+    pages: int
+    users: list[UserListItem]

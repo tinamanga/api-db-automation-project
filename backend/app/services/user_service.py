@@ -1,8 +1,7 @@
 from sqlalchemy.orm import Session
-
-from app.auth.hashing import hash_password,verify_password
-
 from sqlalchemy import or_
+
+from app.auth.hashing import hash_password, verify_password
 from app.models.user import User
 from app.schemas.user import UserCreate
 
@@ -15,7 +14,6 @@ class UserService:
 
     @staticmethod
     def create_user(db: Session, user: UserCreate) -> User:
-
         hashed_password = hash_password(user.password)
 
         db_user = User(
@@ -33,7 +31,7 @@ class UserService:
 
     @staticmethod
     def authenticate_user(
-        db,
+        db: Session,
         email: str,
         password: str,
     ):
@@ -48,17 +46,12 @@ class UserService:
         return user
 
     @staticmethod
-    def get_user_by_id(
-        db: Session,
-        user_id,
-    ):
+    def get_user_by_id(db: Session, user_id):
         return (
             db.query(User)
             .filter(User.id == user_id)
             .first()
         )
-
-
 
     @staticmethod
     def get_all_users(
@@ -67,10 +60,12 @@ class UserService:
         limit: int = 10,
         search: str | None = None,
         role: str | None = None,
+        sort_by: str = "created_at",
+        order: str = "desc",
     ):
         query = db.query(User)
 
-        # Search by first name, last name or email
+        # Search
         if search:
             query = query.filter(
                 or_(
@@ -80,9 +75,25 @@ class UserService:
                 )
             )
 
-        # Filter by role
+        # Filter
         if role:
             query = query.filter(User.role == role)
+
+        # Allowed sorting fields
+        allowed_sort_fields = {
+            "first_name": User.first_name,
+            "last_name": User.last_name,
+            "email": User.email,
+            "role": User.role,
+            "created_at": User.created_at,
+        }
+
+        sort_column = allowed_sort_fields.get(sort_by, User.created_at)
+
+        if order.lower() == "asc":
+            query = query.order_by(sort_column.asc())
+        else:
+            query = query.order_by(sort_column.desc())
 
         total = query.count()
 
@@ -101,15 +112,7 @@ class UserService:
         }
 
     @staticmethod
-    def get_user_by_id(db, user_id):
-        return (
-            db.query(User)
-            .filter(User.id == user_id)
-            .first()
-        )
-
-    @staticmethod
-    def update_user(db, user, user_update):
+    def update_user(db: Session, user: User, user_update):
         update_data = user_update.model_dump(exclude_unset=True)
 
         for key, value in update_data.items():

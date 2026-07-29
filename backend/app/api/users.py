@@ -12,6 +12,8 @@ from app.services.user_service import UserService
 from uuid import UUID
 from fastapi import HTTPException, status
 from fastapi import Query
+from typing import Literal
+from app.schemas.user import PaginatedUsersResponse
 
 router = APIRouter(
     prefix="/users",
@@ -31,23 +33,31 @@ def get_me(
     return current_user
 
 
-@router.get("/")
+@router.get(
+    "/",
+    response_model=PaginatedUsersResponse,
+)
+
 def get_users(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
     search: str | None = None,
     role: str | None = None,
+    sort_by: str = "created_at",
+    order: Literal["asc", "desc"] = "desc",
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_admin: User = Depends(get_current_admin),
 ):
-
     return UserService.get_all_users(
         db=db,
         page=page,
         limit=limit,
         search=search,
         role=role,
+        sort_by=sort_by,
+        order=order,
     )
+
 
 @router.get(
     "/{user_id}",
