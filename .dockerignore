@@ -41,5 +41,5 @@ build/
 dist/
 *.egg-info/
 
-# Node (future frontend)
+# Node (for frontend)
 node_modules/
