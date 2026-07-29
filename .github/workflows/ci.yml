@@ -46,11 +46,12 @@ jobs:
       PORT: 8000
 
       SECRET_KEY: supersecretkey
+      JWT_SECRET_KEY: supersecretkey
 
       DATABASE_URL: postgresql://api_user:password@localhost:5432/api_db_automation
 
       ACCESS_TOKEN_EXPIRE_MINUTES: 30
-      ALGORITHM: HS256
+      JWT_ALGORITHM: HS256 
 
     steps:
 
