@@ -71,3 +71,7 @@ jobs:
       - name: Run tests
         run: |
           pytest
+
+      - name: Run database migrations
+        run: |
+            alembic upgrade head
