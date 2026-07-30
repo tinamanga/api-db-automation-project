@@ -2,6 +2,7 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 BASE_DIR = Path(__file__).resolve().parents[2]
 ENV_FILE = BASE_DIR / ".env"
 
@@ -12,16 +13,19 @@ class Settings(BaseSettings):
     DEBUG: bool
     HOST: str
     PORT: int
+
     SECRET_KEY: str
     DATABASE_URL: str
 
-    JWT_SECRET_KEY: str
-    JWT_ALGORITHM: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    # Defaults allow CI to start even if these aren't explicitly set
+    JWT_SECRET_KEY: str = "supersecretkey"
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     model_config = SettingsConfigDict(
         env_file=ENV_FILE,
         env_file_encoding="utf-8",
+        extra="ignore",
     )
 
 
